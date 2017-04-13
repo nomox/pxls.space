@@ -91,6 +91,7 @@ function launchBot(bot) {
 				});
 				notification.onclick = function() {
 					window.focus();
+					notification.close();
 				}
 			}
 		}
