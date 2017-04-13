@@ -251,11 +251,15 @@ function launchBot(bot) {
 		return (function() {
 			$("head").append("<style>\
 .botpanel {\
+	padding: 10px;\
+	color: white;\
 	box-shadow: 0 0 15px rgba(0,0,0,0.9);\
 	background-color: rgba(0,0,0,0.8);\
 	border-radius: 3px;\
 	bottom: 110px;\
 	opacity: 0.8;\
+	right: 20px;\
+    position: absolute;\
 	transition: opacity 0.3s ease-in-out;\
 }\
 .botpanel:hover {\
@@ -280,7 +284,7 @@ function launchBot(bot) {
 }\
 </style>");
 			ui = $("#ui");
-			ui.append('<div class="online botpanel">'+
+			ui.append('<div class="botpanel">'+
 				'<a target="_blank" title="[Discord]" href="https://discord.gg/7SCbPUe">Ukraine pxls.space</a>'+
 				'<br>'+bot.image.title+
 				"<br>["+(bot.image.x)+", "+(bot.image.y)+"]"+
