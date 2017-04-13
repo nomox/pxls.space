@@ -5,28 +5,71 @@
 		<script src="main.js"></script>
 		<style type="text/css">
 			.message {
-				width: 180px;
+				width: 200px;
 				font-size: 16px;
 			}
 			button {
 				font-size: 20px;
 			}
+			button, select {
+				background-color: #109254;
+				border: none;
+				color: white;
+				padding: 3px 15px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 14px;
+				border-radius: 3px;
+				width: 100%;
+				margin: 2px;
+				cursor: pointer;
+			}
+			a {
+				color: #109254;
+			}
+			.axis {
+				display: inline-block;
+				padding: 4px;
+			}
+			.axis label {
+
+			}
+			.axis input[type="text"] {
+				/*float: left;*/
+				width: 40px;
+			}
+			.input input {
+				width: 100%;
+			}
 		</style>
 	</head>
 	<body>
 		<div class="message">plxs.spase auto placer by NomoX</div>
+		<a target="_blank" title="[Discord]" href="https://discord.gg/7SCbPUe">Ukraine pxls.space</a>
+		<br>
 		<span>Login with:</span>
 		<a href="http://pxls.space/signin/reddit">Reddit</a> | <a href="http://pxls.space/signin/google">Google</a>
 		<br>
-		X:<input id="x-axis" type="text"></br>
-		Y:<input id="y-axis" type="text"></br>
-		Link:<input id="imageLink" type="text"></br>
+		<div class="axis">
+			<label for="xaxis">X:</label>
+			<input name="xaxis" id="x_axis" type="text">
+			<label for="yaxis">Y:</label>
+			<input name="yaxis" id="y_axis" type="text">
+		</div>
+		<br>
+		<div class="input">
+			Image Link:
+			<input name="imageurl" id="imageLink" type="text">
+		</div>
 		Direction:
 		<select id="direction">
-		    <option value="leftright">L->R</option>
-		    <option value="rightleft">R->L</option>
-		    <option value="topdown">T->D</option>
-		    <option value="downtop">D->T</option>
+			<option value="0">Random</option>
+			<option value="1">Left - Right</option>
+			<option value="2">Right - Left</option>
+			<option value="3">Top - Bottom</option>
+			<option value="4">Bottom - Top</option>
+			<option value="5">Chess</option>
 		</select>
 		<br>
 		<button id="startbot">Start!</button>
