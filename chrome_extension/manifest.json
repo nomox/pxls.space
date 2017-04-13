@@ -13,7 +13,7 @@
 		"scripts": ["background.js"]
 	},
 	"content_scripts": [{
-		"matches": ["http://*/*"],
+		"matches": ["http://pxls.space/"],
 		"js": ["content.js"],
 		"run_at": "document_end"
 	}],

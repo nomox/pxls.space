@@ -1,5 +1,6 @@
 // vk.com/nomox
-// 1.3
+// 1.4
+// cool antibot XD
 
 var palette = [
 	[255,255,255],
@@ -19,14 +20,14 @@ var palette = [
 	[207,110,228],
 	[130,0,128]
 ];
-function Botnet(image) {
+function Notabot(image) {
 	// set default params
 	image.ignore = image.ignore || [];
 	image.dir = image.dir || 0;
 	image.pixelize = image.pixelize || false;
 	this.image = image;
 }
-Botnet.prototype.start = function() {
+Notabot.prototype.start = function() {
 	var template = {
 		image: new Image(),
 		canvas: document.createElement('canvas'),
@@ -78,6 +79,9 @@ function launchBot(bot) {
 	var filled_percent = 0;
 	// overwrite
 
+	App.banMe = function() {
+		// do nothing XD
+	}
 	var _onmessage = App.socket.onmessage;
 	App.socket.onmessage = function(a) {
 		var d = JSON.parse(a.data);
@@ -91,7 +95,7 @@ function launchBot(bot) {
 				});
 				notification.onclick = function() {
 					window.focus();
-					notification.close();
+					this.close();
 				}
 			}
 		}
