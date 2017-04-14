@@ -23,8 +23,9 @@ var palette = [
 function Notabot(image) {
 	// set default params
 	image.ignore = image.ignore || [];
+	image.priority = image.priority || [];
 	image.dir = image.dir || 0;
-	image.pixelize = image.pixelize || false;
+	image.pixelize = image.pixelize || true;
 	this.image = image;
 }
 Notabot.prototype.start = function() {
@@ -309,7 +310,8 @@ function launchBot(bot) {
 	background-color: none;\
 	border-radius: 50%;\
 	position: absolute;\
-	margin: 3px;\
+	margin: 6px;\
+	border: 1px solid rgba(0, 0, 0, 0.5);\
 }\
 </style>");
 			ui = $("#ui");
