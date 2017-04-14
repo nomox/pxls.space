@@ -1,5 +1,5 @@
 // vk.com/nomox
-// 1.4
+// 1.5
 // cool antibot XD
 
 var palette = [
@@ -61,7 +61,7 @@ Notabot.prototype.start = function() {
 			else
 				console.log("Template valid true");
 		}
-		App.alert("Title: " + bot.image.title);
+		//App.alert("Title: " + bot.image.title);
 		launchBot(bot);
 	};
 	template.image.crossOrigin = "anonymous";
@@ -110,7 +110,7 @@ function launchBot(bot) {
 	}
 
 	// init
-	var updUI = initBotUI();
+	var controllerUI = initBotUI();
 	setTimeout(draw, FORCE_DELAY);
 	//
 	function draw() {
@@ -139,7 +139,7 @@ function launchBot(bot) {
 			}
 		}
 		filled_percent = Math.ceil(100-((eq_count / t_count) * 100));
-		updUI();
+		controllerUI.updatePercent(filled_percent);
 
 		switch (bot.image.dir) {
 		case 0: // random
@@ -239,17 +239,29 @@ function launchBot(bot) {
 		console.log("Place..");
 		App.switchColor(p.color);
 		App.attemptPlace(p.x, p.y);
-		App.alert("Placed at ["+(p.x)+", "+(p.y)+"] Color " + p.color);
+		controllerUI.alert("Placed at ["+(p.x)+", "+(p.y)+"] Color " + p.color, palette[p.color]);
 	}
 	function initBotUI() {
 		var ui;
 		var preview_toggle = false;
-		function update() {
-			ui.find("#filledpercent").text("Filled "+filled_percent+"%");
+		var controller = {
+			updatePercent: function(p) {
+				ui.find("#filledpercent").text("Filled "+p+"%");
+			},
+			alert: function(m, c) { // message, color
+				ui.find("#alertmsg").text(m);
+				if (c != undefined)
+					ui.find("#alertcolor").css("background-color", "rgb("+c[0]+","+c[1]+","+c[2]+")");
+			}
 		}
-
 		return (function() {
 			$("head").append("<style>\
+.left {\
+	position: absolute;\
+	left: 10px;\
+	bottom: 10px;\
+	z-index: 99;\
+}\
 .botpanel {\
 	padding: 10px;\
 	color: white;\
@@ -282,6 +294,23 @@ function launchBot(bot) {
 .botpanel a {\
 	color: #109254;\
 }\
+.botalert {\
+	position: absolute;\
+	width: 100%;\
+	bottom: 53px;\
+	background-color: rgba(255, 255, 255, 0.8);\
+	padding: 5px;\
+	text-align: center;\
+	font-size: 20px;\
+}\
+.botalert i {\
+	width: 10px;\
+	height: 10px;\
+	background-color: none;\
+	border-radius: 50%;\
+	position: absolute;\
+	margin: 3px;\
+}\
 </style>");
 			ui = $("#ui");
 			ui.append('<div class="botpanel">'+
@@ -301,6 +330,7 @@ function launchBot(bot) {
 					'<option value="5">Chess</option>'+
 				'</select>'+
 			'</div>');
+			ui.append('<div class="botalert"><span id="alertmsg"></span><i id="alertcolor"></i></div>');
 
 			ui.find("#selectdir").val(""+bot.image.dir);
 
@@ -334,7 +364,7 @@ function launchBot(bot) {
 				bot.image.dir = parseInt($(this).val());
 			});
 			
-			return update;
+			return controller;
 		})();
 	}
 }
