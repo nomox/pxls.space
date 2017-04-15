@@ -1,4 +1,4 @@
-# pxls.space auto bot by NomoX
+# pxls.space auto placer by NomoX
 ![EBIN](/chrome_extension/icon.png?raw=true)
 
 Using 
