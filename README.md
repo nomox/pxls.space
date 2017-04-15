@@ -6,7 +6,7 @@ Using
 (function(){
 	var _script = document.createElement('script');
 	_script.type = "text/javascript";
-	_script.src = "https://rawgit.com/NomoX/pxls.space/master/pxlsbot.min.js";
+	_script.src = "https://cdn.rawgit.com/NomoX/pxls.space/master/pxlsbot.min.js";
 	_script.onload = function() {
 		var b = new Notabot({
 			title: "Title", /* title */
