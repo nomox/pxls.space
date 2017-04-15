@@ -78,6 +78,7 @@ function launchBot(bot) {
 	var t_count = countPoints(bot.template.data);
 	var captcha_required = false;
 	var filled_percent = 0;
+	var bot_enabled = true;
 	// overwrite
 
 	App.banMe = function() {
@@ -110,6 +111,12 @@ function launchBot(bot) {
 		_recaptchaCallback(a);
 	}
 
+	var _socketSend = App.socket.send.bind(App.socket);
+	App.socket.send = function(d) {
+		if (d !== JSON.stringify({type: "banme"}))
+			_socketSend(d);
+	}
+
 	// init
 	var controllerUI = initBotUI();
 	setTimeout(draw, FORCE_DELAY);
@@ -122,7 +129,7 @@ function launchBot(bot) {
 			setTimeout(draw, WAIT_DELAY);
 		}
 		else {
-			if (!captcha_required) {
+			if (!captcha_required && bot_enabled) {
 				setTimeout(drawPixel, FORCE_DELAY);
 			}
 			setTimeout(draw, DRAW_DELAY);
@@ -139,8 +146,11 @@ function launchBot(bot) {
 					eq_count++;
 			}
 		}
+		var old_percent = filled_percent;
 		filled_percent = Math.ceil(100-((eq_count / t_count) * 100));
 		controllerUI.updatePercent(filled_percent);
+		if (old_percent > 0)
+			controllerUI.updateSpeed(filled_percent - old_percent);
 
 		switch (bot.image.dir) {
 		case 0: // random
@@ -249,6 +259,9 @@ function launchBot(bot) {
 			updatePercent: function(p) {
 				ui.find("#filledpercent").text("Filled "+p+"%");
 			},
+			updateSpeed: function(p) {
+				ui.find("#fillspeed").text(p+' new piexels');
+			},
 			alert: function(m, c) { // message, color
 				ui.find("#alertmsg").text(m);
 				if (c != undefined)
@@ -295,6 +308,9 @@ function launchBot(bot) {
 .botpanel a {\
 	color: #109254;\
 }\
+.botpanel small {\
+	color: #ccc;\
+}\
 .botalert {\
 	position: absolute;\
 	width: 100%;\
@@ -320,6 +336,8 @@ function launchBot(bot) {
 				'<br>'+bot.image.title+
 				"<br>["+(bot.image.x)+", "+(bot.image.y)+"]"+
 				'<br><span id="filledpercent">Filled '+filled_percent+'%</span>'+
+				'<br><small id="fillspeed">'+filled_percent+' new piexels</small>'+
+				'<br><button id="disablebot">On</button>'+
 				'<br><button id="restartbot">Restart Bot</button>'+
 				'<br><button id="screenshot">Screenshot</button>'+
 				'<br><button id="preview">Preview</button>'+
@@ -360,6 +378,17 @@ function launchBot(bot) {
 				else {
 					$(this).css("background-color", "#109254");
 					updateBoardData(bot.board);
+				}
+			});
+			ui.find("#disablebot").click(function(){
+				bot_enabled = !bot_enabled;
+				if (bot_enabled) {
+					$(this).css("background-color", "#109254");
+					$(this).text("On");
+				}
+				else {
+					$(this).css("background-color", "#ff2967");
+					$(this).text("Off");
 				}
 			});
 			ui.find("#selectdir").change(function(e) {
