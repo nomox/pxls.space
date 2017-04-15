@@ -78,6 +78,7 @@ function launchBot(bot) {
 	var t_count = countPoints(bot.template.data);
 	var captcha_required = false;
 	var filled_percent = 0;
+	var old_pixels = 0;
 	var bot_enabled = true;
 	// overwrite
 
@@ -146,11 +147,12 @@ function launchBot(bot) {
 					eq_count++;
 			}
 		}
-		var old_percent = filled_percent;
+		
 		filled_percent = Math.ceil(100-((eq_count / t_count) * 100));
 		controllerUI.updatePercent(filled_percent);
-		if (old_percent > 0)
-			controllerUI.updateSpeed(filled_percent - old_percent);
+		if (old_pixels > 0)
+			controllerUI.updateSpeed(old_pixels - eq_count);
+		old_pixels = eq_count;
 
 		switch (bot.image.dir) {
 		case 0: // random
@@ -270,12 +272,6 @@ function launchBot(bot) {
 		}
 		return (function() {
 			$("head").append("<style>\
-.left {\
-	position: absolute;\
-	left: 10px;\
-	bottom: 10px;\
-	z-index: 99;\
-}\
 .botpanel {\
 	padding: 10px;\
 	color: white;\
@@ -304,6 +300,13 @@ function launchBot(bot) {
 	width: 100%;\
 	margin: 2px;\
 	cursor: pointer;\
+	outline: none;\
+}\
+.botpanel button:hover, .botpanel select:hover {\
+	background-color: #137144;\
+}\
+.botpanel button.disabled {\
+	background-color: #ff2967;\
 }\
 .botpanel a {\
 	color: #109254;\
@@ -336,7 +339,7 @@ function launchBot(bot) {
 				'<br>'+bot.image.title+
 				"<br>["+(bot.image.x)+", "+(bot.image.y)+"]"+
 				'<br><span id="filledpercent">Filled '+filled_percent+'%</span>'+
-				'<br><small id="fillspeed">'+filled_percent+' new piexels</small>'+
+				'<br><small id="fillspeed" title="at last iteration">0 new piexels</small>'+
 				'<br><button id="disablebot">On</button>'+
 				'<br><button id="restartbot">Restart Bot</button>'+
 				'<br><button id="screenshot">Screenshot</button>'+
@@ -370,24 +373,24 @@ function launchBot(bot) {
 			ui.find("#preview").click(function(){
 				preview_toggle = !preview_toggle;
 				if (preview_toggle) {
-					$(this).css("background-color", "#ff2967");
+					$(this).addClass("disabled");
 					bot.board.context.globalAlpha = 0.6;
 					bot.board.context.drawImage(bot.template.canvas, bot.image.x, bot.image.y);
 					bot.board.context.globalAlpha = 1.0;
 				}
 				else {
-					$(this).css("background-color", "#109254");
+					$(this).removeClass("disabled");
 					updateBoardData(bot.board);
 				}
 			});
 			ui.find("#disablebot").click(function(){
 				bot_enabled = !bot_enabled;
 				if (bot_enabled) {
-					$(this).css("background-color", "#109254");
+					$(this).removeClass("disabled");
 					$(this).text("On");
 				}
 				else {
-					$(this).css("background-color", "#ff2967");
+					$(this).addClass("disabled");
 					$(this).text("Off");
 				}
 			});
