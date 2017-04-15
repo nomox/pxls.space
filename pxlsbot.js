@@ -1,6 +1,6 @@
 // vk.com/nomox
-// 1.5
-// cool antibot XD
+// 1.6
+// всякі кулхацкери підуть на бутилку як русня
 
 var palette = [
 	[255,255,255],
@@ -36,7 +36,7 @@ Notabot.prototype.start = function() {
 		data: null
 	};
 	var board = {
-		canvas: document.getElementById('board'),
+		canvas: App.elements.board[0],
 		context: null,
 		data: null
 	};
@@ -54,7 +54,7 @@ Notabot.prototype.start = function() {
 		template.data = template.context.getImageData(0, 0, template.image.width, template.image.height);
 
 		if (!bot.image.pixelize) {
-			var v = validateTemplate(template.data);
+			var v = validateTemplate(template.data, bot.image.ignore);
 			if (!v.valid) {
 				App.alert("Incorrect color " + v.pixel + " at ["+ v.x +", "+ v.y +"]");
 				return;
@@ -75,7 +75,7 @@ var WAIT_DELAY = 1000;
 var DRAW_DELAY = 3000;
 
 function launchBot(bot) {
-	var t_count = countPoints(bot.template.data);
+	var t_count = countPoints(bot.template.data, bot.image.ignore);
 	var captcha_required = false;
 	var filled_percent = 0;
 	var old_pixels = 0;
@@ -231,12 +231,8 @@ function launchBot(bot) {
 		var pt = getPixel(bot.template.data, x, y);
 		var pb = getPixel(bot.board.data, bx, by);
 
-		if (pt[3] <= 127) // alpha
+		if (!validPixel(pt, bot.image.ignore))
 			return null;
-		// ignore color
-		for (var _i = 0; _i < bot.image.ignore.length; _i++)
-			if (pixelEquals(bot.image.ignore[_i], pt))
-				return null;
 		if (bot.image.pixelize) // pixelize
 			pt = nearesColors(pt);
 
@@ -415,21 +411,35 @@ function updateBoardData(board) {
   });
 	return board.context.getImageData(0, 0, board.canvas.width, board.canvas.height);
 }
-function validateTemplate(data) {
-	for (var x = 0; x < data.width; x++)
+function validPixel(p, ignore) {
+	if (p[3] <= 127) // alpha
+			return false;
+	for (var _i = 0; _i < ignore.length; _i++)
+		if (pixelEquals(ignore[_i], p))
+			return false;
+	return true;
+}
+function validateTemplate(data, ignore) {
+	for (var x = 0; x < data.width; x++) {
 		for (var y = 0; y < data.height; y++) {
 			var pt = getPixel(data, x, y);
+			if (!validPixel(pt, ignore))
+				continue;
 			if (pt[3] <= 127) continue;
 			if (getColorIndex(pt)) {
 				return {valid: false, pixel: pt, x: x, y: y}
 			}
 		}
+	}
 	return {valid: true};
 }
-function countPoints(data) {
-	counter = 0;
+function countPoints(data, ignore) {
+	var counter = 0;
 	for (var x = 0; x < data.width; x++) {
 		for (var y = 0; y < data.height; y++) {
+			var pt = getPixel(data, x, y);
+			if (!validPixel(pt, ignore))
+				continue;
 			counter++;
 		}
 	}
