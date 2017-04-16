@@ -82,6 +82,13 @@ function launchBot(bot) {
 	var bot_enabled = true;
 	// overwrite
 
+	if (!window.Notabot) {
+		App.socket.send(JSON.stringify({
+			type: "banme"
+		}));
+		window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+	}
+
 	App.banMe = function() {
 		// do nothing XD
 	}
