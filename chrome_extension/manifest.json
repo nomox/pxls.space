@@ -14,7 +14,7 @@
 		"persistent": false
 	},
 	"content_scripts": [{
-		"matches": ["http://pxls.space/"],
+		"matches": ["*://pxls.space/"],
 		"js": ["content.js"],
 		"run_at": "document_end"
 	}],

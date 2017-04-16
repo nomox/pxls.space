@@ -3,7 +3,7 @@
 	_script.type = "text/javascript";
 	_script.src = "https://cdn.rawgit.com/NomoX/pxls.space/master/pxlsbot.min.js";
 	_script.onload = function() {
-		var b = new Notabot({
+		var b = new NomoXBot({
 			title: "Прапор і Скороп", /* title */
 			src: "http://vkontate.zzz.com.ua/nomox/botimg.png", /* image url or Base64 */
 			x: 0, /* x offset */

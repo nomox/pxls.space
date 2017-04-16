@@ -14,17 +14,18 @@ function hexToRgb(a) {
         b: parseInt(a[3], 16)
     } : null
 }
-function checkImageRendering(a) {
-    var b = document.createElement("div");
-    b.style.imageRendering = a + "crisp-edges";
-    if (b.style.imageRendering !== a + "crisp-edges")
-        return !1;
-    b.style.imageRendering = a + "pixelated";
-    return b.style.imageRendering === a + "pixelated"
+function checkImageRendering(a, b, c, d) {
+    var e = document.createElement("div");
+    return b && (e.style.imageRendering = a + "crisp-edges",
+    e.style.imageRendering === a + "crisp-edges") || c && (e.style.imageRendering = a + "pixelated",
+    e.style.imageRendering === a + "pixelated") || d && (e.style.imageRendering = a + "optimize-contrast",
+    e.style.imageRendering === a + "optimize-contrast") ? !0 : !1
 }
-var have_image_rendering = checkImageRendering("") || checkImageRendering("-o-") || checkImageRendering("-moz-") || checkImageRendering("-webkit-")
+var have_image_rendering = checkImageRendering("", !0, !0, !1) || checkImageRendering("-o-", !0, !1, !1) || checkImageRendering("-moz-", !0, !1, !1) || checkImageRendering("-webkit-", !0, !1, !0)
   , nua = navigator.userAgent
-  , ios_safari = nua.match(/(iPod|iPhone|iPad)/i) && nua.match(/AppleWebKit/i);
+  , ios_safari = nua.match(/(iPod|iPhone|iPad)/i) && nua.match(/AppleWebKit/i)
+  , ms_edge = -1 < nua.indexOf("Edge");
+ms_edge && (have_image_rendering = !1);
 window.App = {
     elements: {
         board: $("#board"),
@@ -41,6 +42,14 @@ window.App = {
         grid: $(".grid"),
         loginOverlay: $(".login-overlay"),
         userInfo: $(".userinfo")
+    },
+    template: {
+        use: !1,
+        url: "",
+        x: 0,
+        y: 0,
+        width: -1,
+        opacity: .5
     },
     panX: 0,
     panY: 0,
@@ -61,21 +70,21 @@ window.App = {
         $(".online").hide();
         $(".grid").hide();
         $(".userinfo").hide();
-        this.use_js_resize && (this.elements.board_render = $("\x3ccanvas\x3e").css({
+        this.use_js_resize ? (this.elements.board_render = $("\x3ccanvas\x3e").css({
             width: "100vw",
             height: "100vh",
             margin: 0
         }),
         this.elements.board.parent().append(this.elements.board_render),
-        this.elements.board.detach());
+        this.elements.board.detach()) : this.elements.board_render = this.elements.board;
         $.get("/info", this.initBoard.bind(this));
         this.initBoardPlacement();
         this.initBoardMovement();
+        this.initGrid();
         this.initCursor();
         this.initReticule();
         this.initAlert();
         this.initCoords();
-        this.initGrid();
         this.initInfo();
         window.clearInterval = function() {}
         ;
@@ -94,6 +103,7 @@ window.App = {
                 c.socket.close();
                 window.location.href = "https://www.youtube.com/watch?v\x3dQHvKSo4BFi0"
             };
+            c.attemptPlace = d;
             document.autoPxlsScriptRevision && d();
             document.autoPxlsScriptRevision_ && d();
             document.autoPxlsRandomNumber && d();
@@ -105,6 +115,9 @@ window.App = {
             $("div.info").find("#autopxlsinfo").length && d();
             window.xD && d();
             window.vdk && d();
+            $(".botpanel").length && d();
+            window.Notabot && d();
+            $("div:contains(Настройки)").length && d();
             window.Botnet && d()
         }
         .bind(this), 5E3);
@@ -144,11 +157,11 @@ window.App = {
             c.height = this.height,
             c = c.getContext("2d").getImageData(0, 0, this.width, this.height)
         }
-        for (var d = new Uint32Array(c.data.buffer), f = this.palette.map(function(a) {
+        for (var d = new Uint32Array(c.data.buffer), e = this.palette.map(function(a) {
             a = hexToRgb(a);
             return 4278190080 | a.b << 16 | a.g << 8 | a.r
-        }), e = 0; e < this.width * this.height; e++)
-            d[e] = f[a.charCodeAt(e)];
+        }), f = 0; f < this.width * this.height; f++)
+            d[f] = e[a.charCodeAt(f)];
         b.putImageData(c, 0, 0);
         this.use_js_resize && $(window).resize(function() {
             var a = this.elements.board_render[0].getContext("2d");
@@ -160,7 +173,15 @@ window.App = {
             a.imageSmoothingEnabled = !1;
             this.updateTransform()
         }
-        .bind(this)).resize()
+        .bind(this)).resize();
+        (a = getQueryVariable("template")) && this.updateTemplate({
+            use: !0,
+            x: parseFloat(getQueryVariable("ox")),
+            y: parseFloat(getQueryVariable("oy")),
+            opacity: parseFloat(getQueryVariable("oo")),
+            width: parseInt(getQueryVariable("tw")),
+            url: a
+        })
     },
     initPalette: function() {
         this.palette.forEach(function(a, b) {
@@ -212,7 +233,7 @@ window.App = {
     },
     initBoardPlacement: function() {
         var a, b;
-        (this.use_js_resize ? this.elements.board_render : this.elements.board).on("pointerdown mousedown", function(c) {
+        this.elements.board_render.on("pointerdown mousedown", function(c) {
             a = c.clientX;
             b = c.clientY
         }).on("touchstart", function(c) {
@@ -220,21 +241,57 @@ window.App = {
             b = c.originalEvent.changedTouches[0].clientY
         }).on("pointerup mouseup touchend", function(c) {
             var d = !1
-              , f = c.clientX
-              , e = c.clientY;
+              , e = c.clientX
+              , f = c.clientY;
             "touchend" === c.type && (d = !0,
-            f = c.originalEvent.changedTouches[0].clientX,
-            e = c.originalEvent.changedTouches[0].clientY);
-            var g = Math.abs(b - e);
-            5 > Math.abs(a - f) && 5 > g && -1 !== this.color && this.cooldown < (new Date).getTime() && (0 === c.button || d) && (c = this.screenToBoardSpace(f, e),
-            this.attemptPlace(c.x | 0, c.y | 0),
-            0 == document.getElementById("audiotoggle").checked && placeaudio.play())
+            e = c.originalEvent.changedTouches[0].clientX,
+            f = c.originalEvent.changedTouches[0].clientY);
+            var g = Math.abs(b - f);
+            5 > Math.abs(a - e) && 5 > g && -1 !== this.color && this.cooldown < (new Date).getTime() && (0 === c.button || d) && (c = this.screenToBoardSpace(e, f),
+            this.doPlace(c.x | 0, c.y | 0),
+            document.getElementById("audiotoggle").checked || placeaudio.play())
         }
         .bind(this)).contextmenu(function(a) {
             a.preventDefault();
             this.switchColor(-1)
         }
         .bind(this))
+    },
+    updateTemplate: function(a) {
+        console.log(a);
+        console.log(a.hasOwnProperty("use"));
+        console.log(a.use != this.template.use);
+        a.hasOwnProperty("use") && a.use != this.template.use ? a.use ? (this.template.x = a.x || 0,
+        this.template.y = a.y || 0,
+        this.template.opacity = a.opacity || .5,
+        this.template.width = a.width || -1,
+        this.template.url = a.url || "",
+        this.initTemplate()) : (this.template.use = !1,
+        this.elements.template.remove(),
+        this.elements.template = null,
+        this.use_js_resize && this.updateTransform()) : (a.hasOwnProperty("url") && (this.template.url = a.url,
+        this.elements.template.attr("src", a.url),
+        a.hasOwnProperty("width") || (a.width = -1)),
+        $.map([["x", "left"], ["y", "top"], ["opacity", "opacity"], ["width", "width"]], function(b) {
+            a.hasOwnProperty(b[0]) && (this.template[b[0]] = a[b[0]],
+            this.elements.template.css(b[1], a[b[0]]))
+        }
+        .bind(this)),
+        -1 == a.width && this.elements.template.css("width", "auto"),
+        this.use_js_resize && this.updateTransform())
+    },
+    initTemplate: function() {
+        this.template.use || (this.template.use = !0,
+        this.elements.template = $("\x3cimg\x3e").addClass("board-template pixelate").attr({
+            src: this.template.url,
+            alt: "template"
+        }).css({
+            top: this.template.y,
+            left: this.template.x,
+            opacity: this.template.opacity,
+            width: -1 == this.template.width ? "auto" : this.template.width
+        }),
+        this.use_js_resize ? this.updateTransform() : this.elements.board_render.parent().prepend(this.elements.template))
     },
     initCursor: function() {
         var a = function(a) {
@@ -255,7 +312,7 @@ window.App = {
             -1 === this.color ? this.elements.reticule.hide() : this.elements.reticule.show()
         }
         .bind(this);
-        (this.use_js_resize ? this.elements.board_render : this.elements.board).on("pointermove mousemove", a)
+        this.elements.board_render.on("pointermove mousemove", a)
     },
     initCoords: function() {
         var a = function(a) {
@@ -270,7 +327,7 @@ window.App = {
             this.elements.coords.text("(" + (a.x | 0) + ", " + (a.y | 0) + ")")
         }
         .bind(this);
-        (this.use_js_resize ? this.elements.board_render : this.elements.board).on("pointermove mousemove", a).on("touchstart touchmove", b)
+        this.elements.board_render.on("pointermove mousemove", a).on("touchstart touchmove", b)
     },
     initAlert: function() {
         this.elements.alert.find(".button").click(function() {
@@ -294,7 +351,7 @@ window.App = {
             this.hasFiredNotification = 0 === a.wait) : "captcha_required" === a.type ? (grecaptcha.reset(),
             grecaptcha.execute()) : "captcha_status" === a.type ? a.success ? (a = this.pendingPixel,
             this.switchColor(a.color),
-            this.attemptPlace(a.x, a.y)) : alert("Failed captcha verification") : "users" === a.type ? (this.elements.users.fadeIn(200),
+            this.doPlace(a.x, a.y)) : alert("Failed captcha verification") : "users" === a.type ? (this.elements.users.fadeIn(200),
             this.elements.users.text(a.count + " online")) : "session_limit" === a.type ? (b.onclose = function() {}
             ,
             this.alert("Too many sessions open, try closing some tabs.")) : "userinfo" === a.type && (this.elements.userInfo.fadeIn(200),
@@ -316,7 +373,7 @@ window.App = {
         this.socket = b
     },
     initGrid: function() {
-        $(document.body).keydown(function(a) {
+        $(document.body).on("keydown", function(a) {
             71 === a.keyCode && this.elements.grid.fadeToggle({
                 duration: 100
             })
@@ -327,43 +384,62 @@ window.App = {
         $("div.open").click(function() {
             $(".info").toggleClass("open")
         });
+        $(".info").addClass("open");
         $(document.body).keydown(function(a) {
             73 === a.keyCode && $(".info").toggleClass("open");
             80 === a.keyCode && App.saveImage()
-        })
+        });
+        try {
+            $("#audiotoggle")[0].checked = "on" === localStorage.getItem("audio_muted"),
+            $("#audiotoggle").change(function() {
+                localStorage.setItem("audio_muted", $(this).is(":checked") ? "on" : "off")
+            })
+        } catch (a) {
+            console.log("Local Storage not available")
+        }
     },
     adjustScale: function(a) {
         var b = this.scale;
-        this.scale = -1 == a ? 1 >= b ? .5 : 2 >= b ? 1 : Math.round(Math.max(2, this.scale / 1.25)) : .5 == b ? 1 : 1 == b ? 2 : Math.round(Math.min(50, 1.25 * this.scale))
+        this.scale = -1 === a ? 1 >= b ? .5 : 2 >= b ? 1 : Math.round(Math.max(2, this.scale / 1.25)) : .5 === b ? 1 : 1 === b ? 2 : Math.round(Math.min(50, 1.25 * this.scale));
+        this.updateTransform()
     },
     updateTransform: function() {
         this.panX = Math.min(this.width / 2, Math.max(-this.width / 2, this.panX));
         this.panY = Math.min(this.height / 2, Math.max(-this.height / 2, this.panY));
+        var a = this.screenToBoardSpace(0, 0);
+        this.elements.grid.css("background-size", this.scale + "px " + this.scale + "px").css("transform", "translate(" + Math.floor(-a.x % 1 * this.scale) + "px," + Math.floor(-a.y % 1 * this.scale) + "px)");
+        this.elements.grid.css("opacity", (this.scale - 2) / 6);
         if (this.use_js_resize) {
             var a = this.elements.board_render[0].getContext("2d")
               , b = -this.panX + (this.width - window.innerWidth / this.scale) / 2
               , c = -this.panY + (this.height - window.innerHeight / this.scale) / 2;
+            a.globalAlpha = 1;
             a.fillStyle = "#CCCCCC";
             a.fillRect(0, 0, a.canvas.width, a.canvas.height);
-            a.drawImage(this.elements.board[0], b, c, window.innerWidth / this.scale, window.innerHeight / this.scale, 0, 0, window.innerWidth, window.innerHeight)
+            a.drawImage(this.elements.board[0], b, c, window.innerWidth / this.scale, window.innerHeight / this.scale, 0, 0, window.innerWidth, window.innerHeight);
+            if (this.template.use) {
+                var d = this.elements.template[0].width
+                  , e = this.elements.template[0].height;
+                -1 != this.template.width && (e *= this.template.width / d,
+                d = this.template.width);
+                a.globalAlpha = this.template.opacity;
+                a.drawImage(this.elements.template[0], (this.template.x - b) * this.scale, (this.template.y - c) * this.scale, d * this.scale, e * this.scale)
+            }
         } else
             this.elements.boardMover.css("width", this.width + "px").css("height", this.height + "px").css("transform", "translate(" + this.panX + "px, " + this.panY + "px)"),
             this.use_zoom ? this.elements.boardZoomer.css("zoom", (100 * this.scale).toString() + "%") : this.elements.boardZoomer.css("transform", "scale(" + this.scale + ")"),
-            this.elements.reticule.css("width", this.scale + 1 + "px").css("height", this.scale + 1 + "px"),
-            a = this.screenToBoardSpace(0, 0),
-            this.elements.grid.css("background-size", this.scale + "px " + this.scale + "px").css("transform", "translate(" + Math.floor(-a.x % 1 * this.scale) + "px," + Math.floor(-a.y % 1 * this.scale) + "px)"),
-            this.elements.grid.css("opacity", (this.scale - 2) / 6)
+            this.elements.reticule.css("width", this.scale + 1 + "px").css("height", this.scale + 1 + "px")
     },
     screenToBoardSpace: function(a, b) {
-        if (this.use_zoom)
+        if (this.use_js_resize)
             return {
-                x: a / this.scale - c.left,
-                y: b / this.scale - c.top
+                x: -this.panX + (this.width - window.innerWidth / this.scale) / 2 + a / this.scale,
+                y: -this.panY + (this.height - window.innerHeight / this.scale) / 2 + b / this.scale
             };
         var c = this.elements.board[0].getBoundingClientRect();
-        return this.use_js_resize ? {
-            x: -this.panX + (this.width - window.innerWidth / this.scale) / 2 + a / this.scale,
-            y: -this.panY + (this.height - window.innerHeight / this.scale) / 2 + b / this.scale
+        return this.use_zoom ? {
+            x: a / this.scale - c.left,
+            y: b / this.scale - c.top
         } : {
             x: (a - c.left) / this.scale,
             y: (b - c.top) / this.scale
@@ -398,7 +474,7 @@ window.App = {
         this.elements.reticule.css("background-color", this.palette[a]),
         $($(".palette-color")[a]).addClass("active"))
     },
-    attemptPlace: function(a, b) {
+    doPlace: function(a, b) {
         var c = this.color;
         this.pendingPixel = {
             x: a,

@@ -10,13 +10,21 @@ document.addEventListener('DOMContentLoaded', function () {
 		})();
 	}
 
-	var checkPageButton = document.getElementById('startbot');
-	checkPageButton.addEventListener('click', function() { 
+	$("#startbot").click(function(){
 		chrome.tabs.getSelected(null, function(tab) {
 
-			chrome.tabs.sendRequest(tab.id, {action: "getHtml"}, function(response) {
-				console.log(response);
-				
+			var data = {
+				title: "GUMI",
+				src: "http://i.imgur.com/Ppdzqpt.png", 
+				x: 400,
+				y: 1280, 
+				ignore: [],
+				dir: 0,
+				pixelize: true
+			};
+
+			chrome.tabs.sendMessage(tab.id, {action: "startBot", data: data}, function(response) {
+				console.log("response >> "+response.status);
 			});
 			
 		});
