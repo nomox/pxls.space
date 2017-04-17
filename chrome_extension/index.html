@@ -52,6 +52,13 @@
 		<span>Login with:</span>
 		<a href="http://pxls.space/signin/reddit">Reddit</a> | <a href="http://pxls.space/signin/google">Google</a>
 		<br>
+		<div class="input">
+			Title:
+			<input name="title" id="title" type="text">
+			Image Link:
+			<input name="imageurl" id="imageLink" type="text">
+		</div>
+		<br>
 		<div class="axis">
 			<label for="xaxis">X:</label>
 			<input name="xaxis" id="x_axis" type="text">
@@ -59,13 +66,9 @@
 			<input name="yaxis" id="y_axis" type="text">
 		</div>
 		<br>
-		<div class="input">
-			Image Link:
-			<input name="imageurl" id="imageLink" type="text">
-		</div>
 		Direction:
 		<select id="direction">
-			<option value="0">Random</option>
+			<option value="0" selected="selected">Random</option>
 			<option value="1">Left - Right</option>
 			<option value="2">Right - Left</option>
 			<option value="3">Top - Bottom</option>

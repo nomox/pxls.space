@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', function () {
+	// defauld values
+	$("#title").val("Skorop");
+	$("#imageLink").val("http://i.imgur.com/uJLPWv4.png");
+	$("#x_axis").val("0");
+	$("#y_axis").val("1600");
+
 	var links = document.getElementsByTagName("a");
 	for (var i = 0; i < links.length; i++) {
 		(function () {
@@ -12,14 +18,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	$("#startbot").click(function(){
 		chrome.tabs.getSelected(null, function(tab) {
-
 			var data = {
-				title: "GUMI",
-				src: "http://i.imgur.com/Ppdzqpt.png", 
-				x: 400,
-				y: 1280, 
+				title: $("#title").val(),
+				src: $("#imageLink").val(), 
+				x: parseInt($("#x_axis").val()),
+				y: parseInt($("#y_axis").val()),
 				ignore: [],
-				dir: 0,
+				dir: parseInt($("#direction").val()),
 				pixelize: true
 			};
 
