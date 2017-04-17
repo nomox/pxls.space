@@ -8,7 +8,7 @@ Using
 	_script.type = "text/javascript";
 	_script.src = "https://cdn.rawgit.com/NomoX/pxls.space/master/pxlsbot.min.js";
 	_script.onload = function() {
-		var b = new Notabot({
+		var b = new NomoXBot({
 			title: "Title", /* title */
 			src: "http://i.imgur.com/SUyWF5x.png", /* image url or Base64 */
 			x: 60, /* x offset */
