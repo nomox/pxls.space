@@ -1,0 +1,40 @@
+.message {
+	width: 220px;
+	font-size: 16px;
+}
+button {
+	font-size: 20px;
+}
+button, select {
+	background-color: #109254;
+	border: none;
+	color: white;
+	padding: 3px 15px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 14px;
+	border-radius: 3px;
+	width: 100%;
+	margin: 2px;
+	cursor: pointer;
+}
+a {
+	color: #109254;
+}
+.axis {
+	display: inline-block;
+	padding: 4px;
+}
+.axis label {
+}
+.axis input[type="text"] {
+	/*float: left;*/
+	width: 40px;
+}
+.input input {
+	width: 100%;
+}
+input.error {
+	border: 2px solid #F00;
+}

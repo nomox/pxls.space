@@ -1,57 +1,29 @@
 <!doctype html>
 <html>
 	<head>
-		<title>plxs.spase auto placer by NomoX</title>
+		<title>plxs.space auto placer by NomoX</title>
+		<link rel="stylesheet" type="text/css" href="style.css">
 		<script src="jquery-3.2.1.min.js"></script>
 		<script src="main.js"></script>
-		<style type="text/css">
-			.message {
-				width: 200px;
-				font-size: 16px;
-			}
-			button {
-				font-size: 20px;
-			}
-			button, select {
-				background-color: #109254;
-				border: none;
-				color: white;
-				padding: 3px 15px;
-				text-align: center;
-				text-decoration: none;
-				display: inline-block;
-				font-size: 14px;
-				border-radius: 3px;
-				width: 100%;
-				margin: 2px;
-				cursor: pointer;
-			}
-			a {
-				color: #109254;
-			}
-			.axis {
-				display: inline-block;
-				padding: 4px;
-			}
-			.axis label {
-
-			}
-			.axis input[type="text"] {
-				/*float: left;*/
-				width: 40px;
-			}
-			.input input {
-				width: 100%;
-			}
-		</style>
 	</head>
 	<body>
-		<div class="message">plxs.spase auto placer by NomoX</div>
+		<div class="message">plxs.space auto placer by NomoX</div>
 		<a target="_blank" title="[Discord]" href="https://discord.gg/7SCbPUe">Ukraine pxls.space</a>
 		<br>
 		<span>Login with:</span>
 		<a href="http://pxls.space/signin/reddit">Reddit</a> | <a href="http://pxls.space/signin/google">Google</a>
 		<br>
+		<hr>
+		Profile:
+		<select id="profile">
+			
+		</select>
+		<hr>
+		<div class="input">
+			Resource:
+			<input name="resource" id="resource" type="text">
+		</div>
+		<hr>
 		<div class="input">
 			Title:
 			<input name="title" id="title" type="text">

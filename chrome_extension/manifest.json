@@ -1,17 +1,17 @@
 {
 	"manifest_version": 2,
  
-	"name": "plxs.spase auto placer by NomoX",
-	"description": "plxs.spase auto placer by NomoX",
+	"name": "plxs.space Overlay by NomoX",
+	"description": "plxs.space Overlay by NomoX",
 	"version": "1.0",
  
 	"browser_action": {
 		"default_icon": "icon.png",
 		"default_popup": "index.html"
 	},
+	"web_accessible_resources": ["main.js"],
 	"background": {
 		"scripts": ["background.js"],
-		"persistent": false
 	},
 	"content_scripts": [{
 		"matches": ["*://pxls.space/"],
@@ -21,6 +21,9 @@
 	"permissions": [
 		"tabs",
 		"activeTab",
-		"http://*/*"
+		"storage",
+		"webRequest",
+		"webRequestBlocking",
+		"*://pxls.space/"
 	]
 }
