@@ -1,7 +1,7 @@
-# pxls.space auto placer by NomoX
+# pxls.space auto placer
 ![EBIN](/chrome_extension/icon.png?raw=true)
 
-Using 
+How to use 
 ```javascript
 (function(){
 	var _script = document.createElement('script');
